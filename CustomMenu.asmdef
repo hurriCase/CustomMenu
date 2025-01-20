@@ -1,0 +1,17 @@
+{
+    "name": "CustomMenu",
+    "rootNamespace": "CustomMenu",
+    "references": [
+        "GUID:35af6c2fc33422b45adfc9f3f48a017e",
+        "GUID:b36ad6d0e92d8e54f8bf12cf7317743b"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
