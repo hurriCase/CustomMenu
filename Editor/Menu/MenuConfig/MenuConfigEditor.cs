@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace CustomMenu.Editor.Menu.MenuConfig
 {
-    [CustomEditor(typeof(MenuConfigBase))]
+    [CustomEditor(typeof(MenuConfigBase), true)]
     internal sealed class MenuConfigEditor : UnityEditor.Editor
     {
         public override void OnInspectorGUI()
