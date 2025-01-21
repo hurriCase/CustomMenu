@@ -1,149 +1,78 @@
-# Custom Menu Generator
+# Custom Menu Package
 
-A flexible Unity editor menu generation system that allows creating custom menu items through scriptable objects.
+A Unity editor extension that provides a flexible and maintainable way to create custom menu items through ScriptableObject configurations.
 
-## Quick Start
+## Features
 
-1. **Create Menu Configuration**
+- Create menu items for opening scenes
+- Create menu items for selecting assets
+- Create menu items for executing custom methods
+- Configure menu items through ScriptableObject
+- Auto-generate menu item scripts
+
+## Setup
+
+1. Create a menu configuration asset by inheriting from `MenuConfigBase`:
 ```csharp
-// Create custom menu config
-[Resource(name: "CustomMenuConfig", resourcePath: "MyApp/Configs")]
-internal sealed class CustomMenuConfig : MenuConfigBase 
+[CreateAssetMenu(fileName = "MenuConfig", menuName = "Config/MenuConfig")]
+public class MenuConfig : MenuConfigBase
 {
-    private static CustomMenuConfig _instance;
-    internal static CustomMenuConfig Instance => _instance ??= GetInstance<CustomMenuConfig>();
-}
-
-// Initialize the config
-MenuConfigInitializer.InitializeMenuConfig(CustomMenuConfig.Instance);
-```
-
-2. **Configure Menu Items**
-```csharp
-// Add items in the inspector:
-- Scene menu items (open scenes)
-- Asset menu items (select assets)  
-- Method execution items (execute predefined methods)
-```
-
-3. **Generate Menus**
-   Click "Generate Menu Items" in the inspector to create the menu system.
-
-## Core Features
-
-- Configurable menu items through ScriptableObject
-- Different menu item types:
-    - Scene opening
-    - Asset selection
-    - Method execution
-- Custom menu paths and priorities
-- Editor UI for configuration
-- Automated menu script generation
-
-## Essential Configuration
-
-### Menu Config Base
-```csharp
-internal abstract class MenuConfigBase : ScriptableObject
-{
-    [SerializeField] internal SceneMenuItem[] SceneMenuItems;
-    [SerializeField] internal AssetMenuItem[] AssetMenuItems; 
-    [SerializeField] internal MethodExecutionItem[] MethodExecutionItems;
 }
 ```
 
-### Menu Items
+2. Create an instance of your menu configuration asset
+3. Configure your menu items in the inspector:
+   - Scene Menu Items
+   - Asset Menu Items
+   - Method Execution Items
+
+4. Click "Generate Menu Items" to create the menu script
+
+## Menu Item Types
+
+### Scene Menu Items
+- Opens specified scenes in the editor
+- Configure scene asset, menu path, and priority
+- Example path: "Project/Scenes/Main"
+
+### Asset Menu Items
+- Selects specified assets in the Project window
+- Configure target asset, menu path, and priority
+- Example path: "Project/Assets/GameConfig"
+
+### Method Execution Items
+- Executes predefined methods
+- Configure method type, menu path, and priority
+- Available methods:
+   - DeleteAllPlayerPrefs
+- Example path: "Project/Utils/ClearPrefs"
+
+## Configuration Properties
+
+Each menu item type supports:
+- MenuPath: Path in Unity's menu bar
+- Priority: Order within menu section (lower numbers appear first)
+- Specific fields per type (Scene, Asset, or Method)
+
+## Usage Example
+
 ```csharp
-// Scene Menu Item
-internal sealed class SceneMenuItem
+// Create menu config asset
+[CreateAssetMenu(fileName = "GameMenuConfig", menuName = "Config/GameMenuConfig")]
+public class GameMenuConfig : MenuConfigBase 
 {
-    internal string MenuPath = "Project/Scenes";
-    internal SceneAsset Scene;
-    internal int Priority;
 }
 
-// Asset Menu Item  
-internal sealed class AssetMenuItem
+// Menu items will be generated as:
+[MenuItem("Project/Scenes/Main", priority = 0)]
+private static void OpenSceneMain()
 {
-    internal string MenuPath = "Project/Assets";
-    internal Object Asset;
-    internal int Priority;  
-}
-
-// Method Execution Item
-internal sealed class MethodExecutionItem 
-{
-    internal string MenuPath = "Project/MethodExecution";
-    internal MethodExecutionType MethodExecutionType;
-    internal int Priority;
+    EditorSceneManager.OpenScene("Assets/Scenes/Main.unity", OpenSceneMode.Single);
 }
 ```
 
-## Best Practices
+## Notes
 
-1. **Menu Organization**
-    - Use clear menu path hierarchy
-    - Group related items
-    - Assign sensible priorities
-
-2. **Configuration**
-    - Create a single menu config per project
-    - Initialize early in editor startup
-    - Keep menu items organized
-
-3. **Method Execution**
-    - Add new method types to MethodExecutionType enum
-    - Implement method logic in MenuManager
-    - Use for editor-only functionality
-
-## API Reference
-
-### MenuConfigBase
-```csharp
-internal abstract class MenuConfigBase : ScriptableObject
-{
-    protected static T GetInstance<T>() where T : MenuConfigBase;
-    internal SceneMenuItem[] SceneMenuItems { get; }
-    internal AssetMenuItem[] AssetMenuItems { get; }
-    internal MethodExecutionItem[] MethodExecutionItems { get; }
-}
-```
-
-### MenuConfigInitializer
-```csharp
-internal static class MenuConfigInitializer
-{
-    internal static MenuConfigBase MenuConfig { get; }
-    internal static void InitializeMenuConfig(MenuConfigBase menuConfig);
-}
-```
-
-## Common Issues & Solutions
-
-1. **Menus Not Generating**
-    - Verify menu config is initialized
-    - Check menu paths are valid
-    - Ensure assets/scenes exist
-
-2. **Invalid Menu Items**
-    - Menu paths must not be empty
-    - Scene/asset references required
-    - Priority values should be unique
-
-3. **Method Execution Errors**
-    - Add new methods to enum
-    - Implement method logic
-    - Editor-only methods only
-
-## Technical Details
-
-### Menu Generation Process
-1. Read configuration from ScriptableObject
-2. Validate menu items and paths
-3. Generate C# menu script
-4. Refresh Unity asset database
-
-### Menu Item Types
-- Scene menus: Open Unity scenes
-- Asset menus: Select project assets
-- Method execution: Run editor functionality
+- Menu paths should be unique
+- Generated script is created at "Assets/CustomMenu/Scripts/GeneratedMenuItems.cs"
+- Regenerate menu items after configuration changes
