@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using System.Linq;
 using CustomMenu.Editor.Menu.MenuConfig;
 using CustomMenu.Editor.MenuItems.MethodExecution;
@@ -11,15 +12,18 @@ namespace CustomMenu.Editor.Menu
     {
         public static void GenerateMenuItemsScript()
         {
-            var config = MenuConfigInitializer.MenuConfig;
+            var config = MenuConfigBase.MenuConfig;
 
             var scriptContent = GenerateMenuItemsScriptContent(config);
             if (string.IsNullOrWhiteSpace(scriptContent))
                 return;
 
-            var scriptPath = "Assets/CustomMenu/Editor/GeneratedMenuItems.cs";
+            var scriptPath = $"Assets/CustomMenu/Scripts/GeneratedMenuItems.cs";
+            var directory = Path.GetDirectoryName(scriptPath);
+            if (string.IsNullOrEmpty(directory) is false && Directory.Exists(directory) is false)
+                Directory.CreateDirectory(directory);
 
-            System.IO.File.WriteAllText(scriptPath, scriptContent);
+            File.WriteAllText(scriptPath, scriptContent);
             AssetDatabase.Refresh();
         }
 
@@ -29,7 +33,7 @@ namespace CustomMenu.Editor.Menu
 using UnityEditor.SceneManagement;
 using UnityEngine;
 
-namespace CustomMenu.CustomMenu.Editor
+namespace CustomMenu.Scripts
 {
     internal static class GeneratedMenuItems
     {";
