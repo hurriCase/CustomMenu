@@ -18,7 +18,7 @@ namespace CustomMenu.Editor.Menu
             if (string.IsNullOrWhiteSpace(scriptContent))
                 return;
 
-            var scriptPath = $"Assets/CustomMenu/Scripts/GeneratedMenuItems.cs";
+            var scriptPath = $"Assets/CustomMenu/Scripts/Editor/GeneratedMenuItems.cs";
             var directory = Path.GetDirectoryName(scriptPath);
             if (string.IsNullOrEmpty(directory) is false && Directory.Exists(directory) is false)
                 Directory.CreateDirectory(directory);
