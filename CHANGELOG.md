@@ -9,3 +9,6 @@
 - custom MenuConfig didn't create correct script.
 ### Update
 - README.md.
+## [1.0.3] - 2025-01-26
+### Fix
+- Changed to only editor execution in assembly.
