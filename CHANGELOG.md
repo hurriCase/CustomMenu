@@ -12,3 +12,6 @@
 ## [1.0.3] - 2025-01-26
 ### Fix
 - Changed to only editor execution in assembly.
+## [1.0.4] - 2025-01-26
+### Fix
+- Moved menu script creation to editor folder.
