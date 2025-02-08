@@ -3,7 +3,7 @@
     "rootNamespace": "CustomMenu",
     "references": [
         "GUID:35af6c2fc33422b45adfc9f3f48a017e",
-        "GUID:b36ad6d0e92d8e54f8bf12cf7317743b"
+        "GUID:e1647c4da91810d4a8cc92b22a6b264e"
     ],
     "includePlatforms": [
         "Editor"
