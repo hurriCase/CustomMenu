@@ -30,3 +30,6 @@
 ## [1.1.2] - 2025-03-19
 ### Fix
 - DefaultSceneLoader.cs wrong access modifier.
+## [1.1.3] - 2025-03-19
+### Feature
+- Was added SaveCurrentModifiedScenesIfUserWantsTo.
