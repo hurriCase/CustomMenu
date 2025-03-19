@@ -1,4 +1,4 @@
-﻿using CustomMenu.CustomMenu.Editor.MenuItems;
+﻿using CustomMenu.Editor.MenuItems;
 using CustomMenu.Editor.MenuItems.MethodExecution;
 using UnityEngine;
 

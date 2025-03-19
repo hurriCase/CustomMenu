@@ -2,7 +2,7 @@ using System;
 using UnityEditor;
 using UnityEngine;
 
-namespace CustomMenu.CustomMenu.Editor.MenuItems
+namespace CustomMenu.Editor.MenuItems
 {
     [Serializable]
     internal sealed class SceneMenuItem

@@ -2,7 +2,7 @@ using System;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
-namespace CustomMenu.CustomMenu.Editor.MenuItems
+namespace CustomMenu.Editor.MenuItems
 {
     [Serializable]
     internal sealed class AssetMenuItem
