@@ -77,6 +77,9 @@ namespace CustomMenu.Scripts.Editor
         [MenuItem(""{item.MenuPath}"", priority = {item.Priority})]
         private static void {methodName}()
         {{
+            if (EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo() is false)
+                return;
+
             var scenePath = ""{item.ScenePath}"";
             EditorSceneManager.OpenScene(scenePath, OpenSceneMode.Single);
         }}";
