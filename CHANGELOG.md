@@ -22,5 +22,8 @@
 ### Feature
 - Default Scene Loader
 ### Refactor
-- Was added more validation during menu items creation
-- Generated menu item class was made more visual attractive
+- Was added more validation during menu items creation.
+- Generated menu item class was made more visual attractive.
+## [1.1.1] - 2025-03-19
+### Fix
+- Default Scene Asset didn't appear in inspector.
