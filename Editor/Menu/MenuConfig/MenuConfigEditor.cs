@@ -11,20 +11,26 @@ namespace CustomMenu.Editor.Menu.MenuConfig
         {
             serializedObject.Update();
 
-            EditorGUILayout.Space(10);
-            var sceneMenuItemsPropertyName = "SceneMenuItems";
-            EditorGUILayout.PropertyField(
-                serializedObject.FindProperty(sceneMenuItemsPropertyName.ConvertToBackingField()), true);
+            GUI.enabled = false;
+            EditorGUILayout.PropertyField(serializedObject.FindProperty("m_Script"));
+            GUI.enabled = true;
+
+            var sceneMenuItemsField = nameof(MenuConfigBase.SceneMenuItems).ConvertToBackingField();
+            var assetMenuItemsField = nameof(MenuConfigBase.AssetMenuItems).ConvertToBackingField();
+            var methodExecutionItemsField = nameof(MenuConfigBase.MethodExecutionItems).ConvertToBackingField();
+
+            DrawPropertiesExcluding(serializedObject,
+                "m_Script",
+                sceneMenuItemsField,
+                assetMenuItemsField,
+                methodExecutionItemsField);
 
             EditorGUILayout.Space(10);
-            var assetMenuItemsPropertyName = "AssetMenuItems";
-            EditorGUILayout.PropertyField(
-                serializedObject.FindProperty(assetMenuItemsPropertyName.ConvertToBackingField()), true);
-
+            EditorGUILayout.PropertyField(serializedObject.FindProperty(sceneMenuItemsField), true);
             EditorGUILayout.Space(10);
-            var methodExecutionItemsPropertyName = "MethodExecutionItems";
-            EditorGUILayout.PropertyField(
-                serializedObject.FindProperty(methodExecutionItemsPropertyName.ConvertToBackingField()), true);
+            EditorGUILayout.PropertyField(serializedObject.FindProperty(assetMenuItemsField), true);
+            EditorGUILayout.Space(10);
+            EditorGUILayout.PropertyField(serializedObject.FindProperty(methodExecutionItemsField), true);
 
             serializedObject.ApplyModifiedProperties();
 
