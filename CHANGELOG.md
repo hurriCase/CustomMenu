@@ -27,3 +27,6 @@
 ## [1.1.1] - 2025-03-19
 ### Fix
 - Default Scene Asset didn't appear in inspector.
+## [1.1.2] - 2025-03-19
+### Fix
+- DefaultSceneLoader.cs wrong access modifier.
