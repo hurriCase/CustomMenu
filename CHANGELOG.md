@@ -15,6 +15,12 @@
 ## [1.0.4] - 2025-01-26
 ### Fix
 - Moved menu script creation to editor folder.
-## [1.2.4] - 2025-02-08
+## [1.0.5] - 2025-02-08
 ### Update
 - Increase com.firsttry.customextensions package version to v1.2.0.
+## [1.1.0] - 2025-03-19
+### Feature
+- Default Scene Loader
+### Refactor
+- Was added more validation during menu items creation
+- Generated menu item class was made more visual attractive
