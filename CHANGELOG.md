@@ -39,3 +39,6 @@
 ## [1.2.1] - 2025-03-30
 ### Fix
 - Removed generated menu script from package.
+## [1.2.2] - 2025-03-30
+### Fix
+- Changed access modifier for DefaultSceneLoader from internal to public.

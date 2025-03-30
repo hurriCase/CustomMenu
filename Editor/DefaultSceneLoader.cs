@@ -7,9 +7,9 @@ using Object = UnityEngine.Object;
 namespace CustomMenu.Editor
 {
     [InitializeOnLoad]
-    internal static class DefaultSceneLoader
+    public static class DefaultSceneLoader
     {
-        internal const string EnableSetPlayModeSceneKey = "EnableSetPlayModeScene";
+        public const string EnableSetPlayModeSceneKey = "EnableSetPlayModeScene";
 
         private static bool IsChangePlayModeScene
         {
