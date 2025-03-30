@@ -35,4 +35,7 @@
 - Was added SaveCurrentModifiedScenesIfUserWantsTo.
 ## [1.2.0] - 2025-03-19
 ### Feature
-- Was added SaveCurrentModifiedScenesIfUserWantsTo.
+- Base scriptable object was replaced with Custom Window.
+## [1.2.1] - 2025-03-30
+### Fix
+- Removed generated menu script from package.
