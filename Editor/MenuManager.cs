@@ -2,23 +2,26 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using CustomMenu.Editor.Menu.MenuConfig;
 using CustomMenu.Editor.MenuItems.MethodExecution;
 using UnityEditor;
 using UnityEngine;
 
-namespace CustomMenu.Editor.Menu
+namespace CustomMenu.Editor
 {
     internal static class MenuManager
     {
-        public static void GenerateMenuItemsScript()
+        internal static void GenerateMenuItemsScriptFromSettings(CustomMenuSettings settings)
         {
-            var config = MenuConfigBase.MenuConfig;
+            var scriptContent = GenerateMenuItemsScriptContentFromSettings(settings);
 
-            var scriptContent = GenerateMenuItemsScriptContent(config);
             if (string.IsNullOrWhiteSpace(scriptContent))
                 return;
 
+            WriteScriptFile(scriptContent);
+        }
+
+        private static void WriteScriptFile(string scriptContent)
+        {
             var scriptPath = $"Assets/CustomMenu/Scripts/Editor/GeneratedMenuItems.cs";
             var directory = Path.GetDirectoryName(scriptPath);
             if (string.IsNullOrEmpty(directory) is false && Directory.Exists(directory) is false)
@@ -26,9 +29,11 @@ namespace CustomMenu.Editor.Menu
 
             File.WriteAllText(scriptPath, scriptContent);
             AssetDatabase.Refresh();
+
+            Debug.Log("Generated menu items script successfully at: " + scriptPath);
         }
 
-        private static string GenerateMenuItemsScriptContent(MenuConfigBase config)
+        private static string GenerateMenuItemsScriptContentFromSettings(CustomMenuSettings settings)
         {
             var content = @"using UnityEditor;
 using UnityEditor.SceneManagement;
@@ -46,8 +51,8 @@ namespace CustomMenu.Scripts.Editor
             var usedMenuPaths = new HashSet<string>();
 
             // Generate Scene Menu Items
-            if (config.SceneMenuItems != null)
-                foreach (var item in config.SceneMenuItems)
+            if (settings.SceneMenuItems != null)
+                foreach (var item in settings.SceneMenuItems)
                 {
                     if (!item.Scene)
                     {
@@ -86,8 +91,8 @@ namespace CustomMenu.Scripts.Editor
                 }
 
             // Generate Asset Menu Items
-            if (config.AssetMenuItems != null)
-                foreach (var item in config.AssetMenuItems.Where(assetMenuItem => assetMenuItem.Asset))
+            if (settings.AssetMenuItems != null)
+                foreach (var item in settings.AssetMenuItems.Where(assetMenuItem => assetMenuItem.Asset))
                 {
                     if (ValidateMenuPath(item.MenuPath) is false)
                         return string.Empty;
@@ -118,8 +123,8 @@ namespace CustomMenu.Scripts.Editor
                 }
 
             // Generate Custom Menu Items
-            if (config.MethodExecutionItems != null)
-                foreach (var item in config.MethodExecutionItems)
+            if (settings.MethodExecutionItems != null)
+                foreach (var item in settings.MethodExecutionItems)
                 {
                     if (ValidateMenuPath(item.MenuPath) is false)
                         return string.Empty;

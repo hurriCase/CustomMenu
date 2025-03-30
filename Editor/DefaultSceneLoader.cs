@@ -1,5 +1,4 @@
-﻿using CustomMenu.Editor.Menu.MenuConfig;
-using UnityEditor;
+﻿using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -8,11 +7,11 @@ using Object = UnityEngine.Object;
 namespace CustomMenu.Editor
 {
     [InitializeOnLoad]
-    public static class DefaultSceneLoader
+    internal static class DefaultSceneLoader
     {
-        public const string EnableSetPlayModeSceneKey = "EnableSetPlayModeScene";
+        internal const string EnableSetPlayModeSceneKey = "EnableSetPlayModeScene";
 
-        private static bool IsChangePlayMoveScene
+        private static bool IsChangePlayModeScene
         {
             get => EditorPrefs.GetBool(EnableSetPlayModeSceneKey, false);
             set => EditorPrefs.SetBool(EnableSetPlayModeSceneKey, value);
@@ -28,9 +27,9 @@ namespace CustomMenu.Editor
 
         public static void ToggleAutoLoad()
         {
-            IsChangePlayMoveScene = !IsChangePlayMoveScene;
+            IsChangePlayModeScene = !IsChangePlayModeScene;
 
-            Debug.Log($"Auto load startup scene is now {(IsChangePlayMoveScene ? "enabled" : "disabled")}");
+            Debug.Log($"Auto load startup scene is now {(IsChangePlayModeScene ? "enabled" : "disabled")}");
 
             ChangePlayModeScene();
         }
@@ -43,14 +42,15 @@ namespace CustomMenu.Editor
 
         private static void ChangePlayModeScene()
         {
-            if (IsChangePlayMoveScene is false)
+            if (IsChangePlayModeScene is false)
             {
                 var currentScene = GetAsset<SceneAsset>(SceneManager.GetActiveScene().name);
                 EditorSceneManager.playModeStartScene = currentScene;
                 return;
             }
 
-            var startUpScene = MenuConfigBase.MenuConfig.DefaultSceneAsset;
+            var startUpScene = CustomMenuSettings.GetOrCreateSettings().DefaultSceneAsset;
+
             if (startUpScene)
                 EditorSceneManager.playModeStartScene = startUpScene;
         }
