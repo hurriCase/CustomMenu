@@ -33,3 +33,6 @@
 ## [1.1.3] - 2025-03-19
 ### Feature
 - Was added SaveCurrentModifiedScenesIfUserWantsTo.
+## [1.2.0] - 2025-03-19
+### Feature
+- Was added SaveCurrentModifiedScenesIfUserWantsTo.
