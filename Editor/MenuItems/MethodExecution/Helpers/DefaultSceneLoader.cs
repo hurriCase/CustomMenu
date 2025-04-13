@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using Object = UnityEngine.Object;
 
-namespace CustomMenu.Editor
+namespace CustomMenu.Editor.MenuItems.MethodExecution.Helpers
 {
     [InitializeOnLoad]
     public static class DefaultSceneLoader
@@ -27,12 +27,14 @@ namespace CustomMenu.Editor
 
         public static void ToggleAutoLoad()
         {
-            IsChangePlayModeScene = !IsChangePlayModeScene;
+            IsChangePlayModeScene = IsChangePlayModeScene is false;
 
             Debug.Log($"Auto load startup scene is now {(IsChangePlayModeScene ? "enabled" : "disabled")}");
 
             ChangePlayModeScene();
         }
+
+        public static bool IsDefaultSceneSet() => EditorPrefs.GetBool(EnableSetPlayModeSceneKey, false);
 
         private static void OnEditorQuitting()
         {
