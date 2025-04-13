@@ -2,9 +2,5 @@
   "name": "com.firsttry.custommenu",
   "version": "1.2.2",
   "displayName": "Custom Menu",
-  "unity": "2022.1",
-    "dependencies": {
-        "com.firsttry.assetloader": "1.2.1",
-        "com.firsttry.customextensions": "1.2.0"
-    }
+  "unity": "2022.1"
 }
