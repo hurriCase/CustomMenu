@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace CustomMenu.Editor.MenuItems.MethodExecution.Helpers
 {
-    internal static class DebugSymbolHandler
+    public static class DebugSymbolHandler
     {
         private const string DebugDefineSymbol = "IS_DEBUG";
 
