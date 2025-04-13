@@ -52,3 +52,7 @@
 ## [1.3.1] - 2025-04-13
 ### Fix
 - Wrong access modifier for DebugSymbolHandler.
+## [1.4.0] - 2025-04-13
+### Refactor
+- Made MenuItem more generic.
+- Now scripting symbol is user defined without IS_DEBUG only option. 
