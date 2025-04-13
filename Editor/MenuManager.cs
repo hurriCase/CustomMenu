@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using CustomMenu.Editor.MenuItems.MethodExecution;
+using CustomMenu.Editor.MenuItems.MenuItems.MethodExecution;
 using UnityEditor;
 using UnityEngine;
 
@@ -22,7 +22,7 @@ namespace CustomMenu.Editor
 
         private static void WriteScriptFile(string scriptContent)
         {
-            var scriptPath = $"Assets/CustomMenu/Scripts/Editor/GeneratedMenuItems.cs";
+            var scriptPath = "Assets/CustomMenu/Scripts/Editor/GeneratedMenuItems.cs";
             var directory = Path.GetDirectoryName(scriptPath);
             if (string.IsNullOrEmpty(directory) is false && Directory.Exists(directory) is false)
                 Directory.CreateDirectory(directory);
@@ -35,11 +35,10 @@ namespace CustomMenu.Editor
 
         private static string GenerateMenuItemsScriptContentFromSettings(CustomMenuSettings settings)
         {
-            var content = @"using UnityEditor;
+            var content = @"using CustomMenu.Editor.MenuItems.Helpers;
+using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
-using CustomMenu.Editor;
-using CustomMenu.Editor.MenuItems.MethodExecution.Helpers;
 
 namespace CustomMenu.Scripts.Editor
 {
@@ -55,7 +54,7 @@ namespace CustomMenu.Scripts.Editor
             if (settings.SceneMenuItems != null)
                 foreach (var item in settings.SceneMenuItems)
                 {
-                    if (!item.Scene)
+                    if (!item.MenuTarget)
                     {
                         Debug.LogError(
                             "[MenuManager::GenerateMenuItemsScriptContent] Scene Asset must be assigned to create Menu Items");
@@ -67,7 +66,8 @@ namespace CustomMenu.Scripts.Editor
 
                     if (usedMenuPaths.Add(item.MenuPath) is false)
                     {
-                        Debug.LogError($"[MenuManager] Duplicate menu path '{item.MenuPath}' for scene '{item.SceneName}'. Skipping this item.");
+                        Debug.LogError($"[MenuManager] Duplicate menu path '{item.MenuPath}' " +
+                                       $"for scene '{item.SceneName}'. Skipping this item.");
                         continue;
                     }
 
@@ -93,21 +93,22 @@ namespace CustomMenu.Scripts.Editor
 
             // Generate Asset Menu Items
             if (settings.AssetMenuItems != null)
-                foreach (var item in settings.AssetMenuItems.Where(assetMenuItem => assetMenuItem.Asset))
+                foreach (var item in settings.AssetMenuItems.Where(assetMenuItem => assetMenuItem.MenuTarget))
                 {
                     if (ValidateMenuPath(item.MenuPath) is false)
                         return string.Empty;
 
                     if (usedMenuPaths.Add(item.MenuPath) is false)
                     {
-                        Debug.LogError($"[MenuManager] Duplicate menu path '{item.MenuPath}' for asset '{item.Asset.name}'. Skipping this item.");
+                        Debug.LogError($"[MenuManager] Duplicate menu path '{item.MenuPath}' " +
+                                       $"for asset '{item.MenuTarget.name}'. Skipping this item.");
                         continue;
                     }
 
-                    var baseMethodName = $"SelectAsset{item.Asset.name.Replace(" ", "_")}";
+                    var baseMethodName = $"SelectAsset{item.MenuTarget.name.Replace(" ", "_")}";
                     var methodName = GetUniqueMethodName(baseMethodName, usedMethodNames);
 
-                    var assetPath = AssetDatabase.GetAssetPath(item.Asset);
+                    var assetPath = AssetDatabase.GetAssetPath(item.MenuTarget);
 
                     if (isFirstMenuItem)
                         isFirstMenuItem = false;
@@ -132,7 +133,8 @@ namespace CustomMenu.Scripts.Editor
 
                     if (usedMenuPaths.Add(item.MenuPath) is false)
                     {
-                        Debug.LogError($"[MenuManager] Duplicate menu path '{item.MenuPath}' for method '{item.MethodExecutionType}'. Skipping this item.");
+                        Debug.LogError($"[MenuManager] Duplicate menu path '{item.MenuPath}' " +
+                                       $"for method '{item.MenuTarget}'. Skipping this item.");
                         continue;
                     }
 
@@ -141,15 +143,53 @@ namespace CustomMenu.Scripts.Editor
                     else
                         content += "\n";
 
-                    // Generate method based on its type (Toggle or Regular)
-                    if (IsToggleMethod(item.MethodExecutionType))
+                    content += GenerateMethodExecutionContent(item, usedMethodNames);
+                }
+
+            // Generate Scripting Symbol Menu Items
+            if (settings.ScriptingSymbols != null)
+                foreach (var symbol in settings.ScriptingSymbols)
+                {
+                    if (string.IsNullOrEmpty(symbol.MenuTarget))
                     {
-                        content += GenerateToggleMethodContent(item, usedMethodNames);
+                        Debug.LogError("[MenuManager] Symbol name cannot be empty");
+                        continue;
                     }
+
+                    if (ValidateMenuPath(symbol.MenuPath) is false)
+                        continue;
+
+                    if (usedMenuPaths.Add(symbol.MenuPath) is false)
+                    {
+                        Debug.LogError($"[MenuManager] Duplicate menu path '{symbol.MenuPath}' " +
+                                       $"for symbol '{symbol.MenuTarget}'. Skipping this item.");
+                        continue;
+                    }
+
+                    var baseMethodName = $"ToggleSymbol_{symbol.MenuTarget.Replace(" ", "_")}";
+                    var methodName = GetUniqueMethodName(baseMethodName, usedMethodNames);
+                    var validateMethodName = $"Validate{methodName}";
+
+                    var prefsKey = symbol.GetPrefsKey();
+
+                    if (isFirstMenuItem)
+                        isFirstMenuItem = false;
                     else
-                    {
-                        content += GenerateRegularMethodContent(item, usedMethodNames);
-                    }
+                        content += "\n";
+
+                    content += $@"
+        [MenuItem(""{symbol.MenuPath}"", priority = {symbol.Priority})]
+        private static void {methodName}()
+        {{
+            ScriptingSymbolHandler.ToggleSymbol(""{symbol.MenuTarget}"", ""{prefsKey}"");
+        }}
+
+        [MenuItem(""{symbol.MenuPath}"", true)]
+        private static bool {validateMethodName}()
+        {{
+            Menu.SetChecked(""{symbol.MenuPath}"", ScriptingSymbolHandler.IsSymbolEnabled(""{prefsKey}"", false));
+            return true;
+        }}";
                 }
 
             content += @"
@@ -159,65 +199,36 @@ namespace CustomMenu.Scripts.Editor
             return content;
         }
 
-        private static string GenerateRegularMethodContent(MethodExecutionItem item, HashSet<string> usedMethodNames)
+        private static string GenerateMethodExecutionContent(MethodExecutionItem item, HashSet<string> usedMethodNames)
         {
-            var baseMethodName = item.MethodExecutionType.ToString();
+            var baseMethodName = item.MenuTarget.ToString();
             var methodName = GetUniqueMethodName(baseMethodName, usedMethodNames);
 
-            return $@"
+            return item.MenuTarget switch
+            {
+                MethodExecutionType.DeleteAllPlayerPrefs => $@"
         [MenuItem(""{item.MenuPath}"", priority = {item.Priority})]
         private static void {methodName}()
         {{
-            {GenerateMethodExecutionCode(item.MethodExecutionType)}
-        }}";
-        }
+            PlayerPrefs.DeleteAll();
+            Debug.Log(""All PlayerPrefs deleted."");
+        }}",
 
-        private static string GenerateToggleMethodContent(MethodExecutionItem item, HashSet<string> usedMethodNames)
-        {
-            var baseMethodName = item.MethodExecutionType.ToString();
-            var methodName = GetUniqueMethodName(baseMethodName, usedMethodNames);
-            var validateMethodName = $"Validate{methodName}";
-            var toggleCheckStateMethod = GetToggleCheckStateMethod(item.MethodExecutionType);
-
-            return $@"
+                MethodExecutionType.ToggleDefaultSceneAutoLoad => $@"
         [MenuItem(""{item.MenuPath}"", priority = {item.Priority})]
         private static void {methodName}()
         {{
-            {GenerateMethodExecutionCode(item.MethodExecutionType)}
+            DefaultSceneLoader.ToggleAutoLoad();
         }}
 
         [MenuItem(""{item.MenuPath}"", true)]
-        private static bool {validateMethodName}()
+        private static bool Validate{methodName}()
         {{
-            Menu.SetChecked(""{item.MenuPath}"", {toggleCheckStateMethod});
+            Menu.SetChecked(""{item.MenuPath}"", DefaultSceneLoader.IsDefaultSceneSet());
             return true;
-        }}";
-        }
+        }}",
 
-        private static string GenerateMethodExecutionCode(MethodExecutionType methodType) =>
-            methodType switch
-            {
-                MethodExecutionType.DeleteAllPlayerPrefs => "PlayerPrefs.DeleteAll();",
-                MethodExecutionType.ToggleDefaultSceneAutoLoad => "DefaultSceneLoader.ToggleAutoLoad();",
-                MethodExecutionType.ToggleDebugSymbol => "DebugSymbolHandler.ToggleDebugSymbol();",
-                _ => throw new ArgumentOutOfRangeException(nameof(methodType), methodType, null)
-            };
-
-        private static string GetToggleCheckStateMethod(MethodExecutionType methodType) =>
-            methodType switch
-            {
-                MethodExecutionType.ToggleDefaultSceneAutoLoad => "DefaultSceneLoader.IsDefaultSceneSet()",
-                MethodExecutionType.ToggleDebugSymbol => "DebugSymbolHandler.IsDebugSymbolEnabled()",
-                _ => throw new ArgumentOutOfRangeException(nameof(methodType), methodType, "Not a toggle method type")
-            };
-
-        private static bool IsToggleMethod(MethodExecutionType methodType)
-        {
-            return methodType switch
-            {
-                MethodExecutionType.ToggleDefaultSceneAutoLoad => true,
-                MethodExecutionType.ToggleDebugSymbol => true,
-                _ => false
+                _ => throw new ArgumentOutOfRangeException(nameof(item.MenuTarget), item.MenuTarget, null)
             };
         }
 

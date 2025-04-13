@@ -1,24 +1,24 @@
-﻿using CustomMenu.Editor.MenuItems;
+using CustomMenu.Editor.MenuItems;
 using UnityEditor;
 using UnityEngine;
 
-namespace CustomMenu.Editor.Window.Drawers
+namespace CustomMenu.Editor.Window
 {
-    [CustomPropertyDrawer(typeof(SceneMenuItem))]
-    internal class SceneMenuItemDrawer : PropertyDrawer
+    [CustomPropertyDrawer(typeof(BaseMenuItem<>), true)]
+    internal sealed class BaseMenuItemDrawer : PropertyDrawer
     {
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
         {
             EditorGUI.BeginProperty(position, label, property);
 
-            var menuPathProp = property.FindFieldRelative(nameof(SceneMenuItem.MenuPath));
-            var sceneProp = property.FindFieldRelative(nameof(SceneMenuItem.Scene));
-            var priorityProp = property.FindFieldRelative(nameof(SceneMenuItem.Priority));
+            var menuTargetProp = property.FindFieldRelative(nameof(BaseMenuItem<object>.MenuTarget));
+            var menuPathProp = property.FindFieldRelative(nameof(BaseMenuItem<object>.MenuPath));
+            var priorityProp = property.FindFieldRelative(nameof(BaseMenuItem<object>.Priority));
 
             position.height = EditorGUIUtility.singleLineHeight;
 
-            var sceneRect = new Rect(position);
-            EditorGUI.PropertyField(sceneRect, sceneProp, new GUIContent("Scene Asset"));
+            var targetRect = new Rect(position);
+            EditorGUI.PropertyField(targetRect, menuTargetProp, new GUIContent(menuTargetProp.displayName));
             position.y += EditorGUIUtility.singleLineHeight + EditorGUIUtility.standardVerticalSpacing;
 
             var menuPathRect = new Rect(position);

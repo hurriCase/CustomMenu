@@ -1,6 +1,6 @@
 ﻿using System.IO;
-using CustomMenu.Editor.MenuItems;
-using CustomMenu.Editor.MenuItems.MethodExecution;
+using CustomMenu.Editor.MenuItems.MenuItems;
+using CustomMenu.Editor.MenuItems.MenuItems.MethodExecution;
 using CustomMenu.Editor.Window;
 using UnityEditor;
 using UnityEngine;

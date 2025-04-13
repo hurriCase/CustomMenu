@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using Object = UnityEngine.Object;
 
-namespace CustomMenu.Editor.MenuItems.MethodExecution.Helpers
+namespace CustomMenu.Editor.MenuItems.Helpers
 {
     [InitializeOnLoad]
     public static class DefaultSceneLoader
