@@ -42,3 +42,10 @@
 ## [1.2.2] - 2025-03-30
 ### Fix
 - Changed access modifier for DefaultSceneLoader from internal to public.
+## [1.2.3] - 2025-04-13
+### Feature
+- ToggleDebugSymbol
+### Refactor
+- Folder structure.
+- Removed outer package dependencies.
+- Small adjustments.
