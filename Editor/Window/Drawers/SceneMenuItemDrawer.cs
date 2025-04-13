@@ -11,12 +11,9 @@ namespace CustomMenu.Editor.Window.Drawers
         {
             EditorGUI.BeginProperty(position, label, property);
 
-            var menuPathProp = property
-                .FindPropertyRelative(nameof(SceneMenuItem.MenuPath).ConvertToBackingField());
-            var sceneProp = property
-                .FindPropertyRelative(nameof(SceneMenuItem.Scene).ConvertToBackingField());
-            var priorityProp = property
-                .FindPropertyRelative(nameof(SceneMenuItem.Priority).ConvertToBackingField());
+            var menuPathProp = property.FindFieldRelative(nameof(SceneMenuItem.MenuPath));
+            var sceneProp = property.FindFieldRelative(nameof(SceneMenuItem.Scene));
+            var priorityProp = property.FindFieldRelative(nameof(SceneMenuItem.Priority));
 
             position.height = EditorGUIUtility.singleLineHeight;
 

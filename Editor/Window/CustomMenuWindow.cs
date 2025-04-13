@@ -38,14 +38,10 @@ namespace CustomMenu.Editor.Window
             _settings = CustomMenuSettings.GetOrCreateSettings();
             _serializedObject = new SerializedObject(_settings);
 
-            _defaultSceneAssetProperty =
-                _serializedObject.FindProperty(nameof(_settings.DefaultSceneAsset).ConvertToBackingField());
-            _sceneMenuItemsProperty =
-                _serializedObject.FindProperty(nameof(_settings.SceneMenuItems).ConvertToBackingField());
-            _assetMenuItemsProperty =
-                _serializedObject.FindProperty(nameof(_settings.AssetMenuItems).ConvertToBackingField());
-            _methodExecutionItemsProperty =
-                _serializedObject.FindProperty(nameof(_settings.MethodExecutionItems).ConvertToBackingField());
+            _defaultSceneAssetProperty = _serializedObject.FindField(nameof(_settings.DefaultSceneAsset));
+            _sceneMenuItemsProperty = _serializedObject.FindField(nameof(_settings.SceneMenuItems));
+            _assetMenuItemsProperty = _serializedObject.FindField(nameof(_settings.AssetMenuItems));
+            _methodExecutionItemsProperty = _serializedObject.FindField(nameof(_settings.MethodExecutionItems));
         }
 
         private void OnGUI()
