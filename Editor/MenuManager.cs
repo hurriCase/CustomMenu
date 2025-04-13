@@ -39,6 +39,7 @@ namespace CustomMenu.Editor
 using UnityEditor.SceneManagement;
 using UnityEngine;
 using CustomMenu.Editor;
+using CustomMenu.Editor.MenuItems.MethodExecution.Helpers;
 
 namespace CustomMenu.Scripts.Editor
 {
@@ -122,7 +123,7 @@ namespace CustomMenu.Scripts.Editor
         }}";
                 }
 
-            // Generate Custom Menu Items
+            // Generate Custom Method Execution Menu Items
             if (settings.MethodExecutionItems != null)
                 foreach (var item in settings.MethodExecutionItems)
                 {
@@ -140,37 +141,14 @@ namespace CustomMenu.Scripts.Editor
                     else
                         content += "\n";
 
-                    if (item.MethodExecutionType == MethodExecutionType.ToggleDefaultSceneAutoLoad)
+                    // Generate method based on its type (Toggle or Regular)
+                    if (IsToggleMethod(item.MethodExecutionType))
                     {
-                        var baseMethodName = item.MethodExecutionType.ToString();
-                        var methodName = GetUniqueMethodName(baseMethodName, usedMethodNames);
-                        var validateMethodName = $"Validate{methodName}";
-
-                        content += $@"
-        [MenuItem(""{item.MenuPath}"", priority = {item.Priority})]
-        private static void {methodName}()
-        {{
-            DefaultSceneLoader.ToggleAutoLoad();
-        }}
-
-        [MenuItem(""{item.MenuPath}"", true)]
-        private static bool {validateMethodName}()
-        {{
-            Menu.SetChecked(""{item.MenuPath}"", EditorPrefs.GetBool(DefaultSceneLoader.EnableSetPlayModeSceneKey, false));
-            return true;
-        }}";
+                        content += GenerateToggleMethodContent(item, usedMethodNames);
                     }
                     else
                     {
-                        var baseMethodName = item.MethodExecutionType.ToString();
-                        var methodName = GetUniqueMethodName(baseMethodName, usedMethodNames);
-
-                        content += $@"
-        [MenuItem(""{item.MenuPath}"", priority = {item.Priority})]
-        private static void {methodName}()
-        {{
-            {GenerateCustomMethodContent(item.MethodExecutionType)}
-        }}";
+                        content += GenerateRegularMethodContent(item, usedMethodNames);
                     }
                 }
 
@@ -181,19 +159,66 @@ namespace CustomMenu.Scripts.Editor
             return content;
         }
 
-        private static string GetUniqueMethodName(string baseName, HashSet<string> usedNames)
+        private static string GenerateRegularMethodContent(MethodExecutionItem item, HashSet<string> usedMethodNames)
         {
-            var methodName = baseName;
-            var suffix = 1;
+            var baseMethodName = item.MethodExecutionType.ToString();
+            var methodName = GetUniqueMethodName(baseMethodName, usedMethodNames);
 
-            while (usedNames.Contains(methodName))
+            return $@"
+        [MenuItem(""{item.MenuPath}"", priority = {item.Priority})]
+        private static void {methodName}()
+        {{
+            {GenerateMethodExecutionCode(item.MethodExecutionType)}
+        }}";
+        }
+
+        private static string GenerateToggleMethodContent(MethodExecutionItem item, HashSet<string> usedMethodNames)
+        {
+            var baseMethodName = item.MethodExecutionType.ToString();
+            var methodName = GetUniqueMethodName(baseMethodName, usedMethodNames);
+            var validateMethodName = $"Validate{methodName}";
+            var toggleCheckStateMethod = GetToggleCheckStateMethod(item.MethodExecutionType);
+
+            return $@"
+        [MenuItem(""{item.MenuPath}"", priority = {item.Priority})]
+        private static void {methodName}()
+        {{
+            {GenerateMethodExecutionCode(item.MethodExecutionType)}
+        }}
+
+        [MenuItem(""{item.MenuPath}"", true)]
+        private static bool {validateMethodName}()
+        {{
+            Menu.SetChecked(""{item.MenuPath}"", {toggleCheckStateMethod});
+            return true;
+        }}";
+        }
+
+        private static string GenerateMethodExecutionCode(MethodExecutionType methodType) =>
+            methodType switch
             {
-                methodName = $"{baseName}_{suffix}";
-                suffix++;
-            }
+                MethodExecutionType.DeleteAllPlayerPrefs => "PlayerPrefs.DeleteAll();",
+                MethodExecutionType.ToggleDefaultSceneAutoLoad => "DefaultSceneLoader.ToggleAutoLoad();",
+                MethodExecutionType.ToggleDebugSymbol => "DebugSymbolHandler.ToggleDebugSymbol();",
+                _ => throw new ArgumentOutOfRangeException(nameof(methodType), methodType, null)
+            };
 
-            usedNames.Add(methodName);
-            return methodName;
+        private static string GetToggleCheckStateMethod(MethodExecutionType methodType) =>
+            methodType switch
+            {
+                MethodExecutionType.ToggleDefaultSceneAutoLoad => "DefaultSceneLoader.IsDefaultSceneSet()",
+                MethodExecutionType.ToggleDebugSymbol => "DebugSymbolHandler.IsDebugSymbolEnabled()",
+                _ => throw new ArgumentOutOfRangeException(nameof(methodType), methodType, "Not a toggle method type")
+            };
+
+        private static bool IsToggleMethod(MethodExecutionType methodType)
+        {
+            return methodType switch
+            {
+                MethodExecutionType.ToggleDefaultSceneAutoLoad => true,
+                MethodExecutionType.ToggleDebugSymbol => true,
+                _ => false
+            };
         }
 
         private static bool ValidateMenuPath(string path)
@@ -230,12 +255,19 @@ namespace CustomMenu.Scripts.Editor
             return false;
         }
 
-        private static string GenerateCustomMethodContent(MethodExecutionType methodName) =>
-            methodName switch
+        private static string GetUniqueMethodName(string baseName, HashSet<string> usedNames)
+        {
+            var methodName = baseName;
+            var suffix = 1;
+
+            while (usedNames.Contains(methodName))
             {
-                MethodExecutionType.DeleteAllPlayerPrefs => "PlayerPrefs.DeleteAll();",
-                MethodExecutionType.ToggleDefaultSceneAutoLoad => "DefaultSceneLoader.ToggleAutoLoad();",
-                _ => throw new ArgumentOutOfRangeException(nameof(methodName), methodName, null)
-            };
+                methodName = $"{baseName}_{suffix}";
+                suffix++;
+            }
+
+            usedNames.Add(methodName);
+            return methodName;
+        }
     }
 }
