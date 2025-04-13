@@ -12,6 +12,7 @@ namespace CustomMenu.Editor.Window
         private SerializedProperty _sceneMenuItemsProperty;
         private SerializedProperty _assetMenuItemsProperty;
         private SerializedProperty _methodExecutionItemsProperty;
+        private SerializedProperty _scriptingSymbolsProperty;
 
         private Vector2 _scrollPosition;
 
@@ -20,7 +21,7 @@ namespace CustomMenu.Editor.Window
         {
             EditorApplication.delayCall += () =>
             {
-                if (!CustomMenuSettings.SettingsExist())
+                if (CustomMenuSettings.SettingsExist() is false)
                     CustomMenuSettings.GetOrCreateSettings();
             };
         }
@@ -42,6 +43,7 @@ namespace CustomMenu.Editor.Window
             _sceneMenuItemsProperty = _serializedObject.FindField(nameof(_settings.SceneMenuItems));
             _assetMenuItemsProperty = _serializedObject.FindField(nameof(_settings.AssetMenuItems));
             _methodExecutionItemsProperty = _serializedObject.FindField(nameof(_settings.MethodExecutionItems));
+            _scriptingSymbolsProperty = _serializedObject.FindField(nameof(_settings.ScriptingSymbols));
         }
 
         private void OnGUI()
@@ -65,24 +67,13 @@ namespace CustomMenu.Editor.Window
 
             _scrollPosition = EditorGUILayout.BeginScrollView(_scrollPosition);
 
-            EditorGUILayout.LabelField("Default Scene Asset", EditorStyles.boldLabel);
             EditorGUILayout.PropertyField(_defaultSceneAssetProperty, new GUIContent("Default Scene"));
-            EditorGUILayout.Space(15);
-
-            EditorGUILayout.LabelField("Scene Menu Items", EditorStyles.boldLabel);
             EditorGUILayout.PropertyField(_sceneMenuItemsProperty, true);
-            EditorGUILayout.Space(15);
-
-            EditorGUILayout.LabelField("Asset Menu Items", EditorStyles.boldLabel);
             EditorGUILayout.PropertyField(_assetMenuItemsProperty, true);
-            EditorGUILayout.Space(15);
-
-            EditorGUILayout.LabelField("Method Execution Items", EditorStyles.boldLabel);
             EditorGUILayout.PropertyField(_methodExecutionItemsProperty, true);
+            EditorGUILayout.PropertyField(_scriptingSymbolsProperty, true);
 
             EditorGUILayout.EndScrollView();
-
-            EditorGUILayout.Space(10);
 
             GUILayout.BeginHorizontal();
             GUILayout.FlexibleSpace();

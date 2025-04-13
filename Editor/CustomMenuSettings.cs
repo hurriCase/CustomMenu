@@ -12,7 +12,8 @@ namespace CustomMenu.Editor
         [field: SerializeField] internal SceneAsset DefaultSceneAsset { get; private set; }
         [field: SerializeField] internal SceneMenuItem[] SceneMenuItems { get; private set; }
         [field: SerializeField] internal AssetMenuItem[] AssetMenuItems { get; private set; }
-        [field: SerializeField] internal MethodExecutionItem[] MethodExecutionItems { get; private set; }
+        [field: SerializeField] internal MethodExecutionMenuItem[] MethodExecutionItems { get; private set; }
+        [field: SerializeField] internal ScriptingSymbolMenuItem[] ScriptingSymbols { get; private set; }
 
         private const string SettingsPath = "Assets/CustomMenu/Editor/Settings/CustomMenuSettings.asset";
 

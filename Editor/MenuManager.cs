@@ -199,15 +199,15 @@ namespace CustomMenu.Scripts.Editor
             return content;
         }
 
-        private static string GenerateMethodExecutionContent(MethodExecutionItem item, HashSet<string> usedMethodNames)
+        private static string GenerateMethodExecutionContent(MethodExecutionMenuItem menuItem, HashSet<string> usedMethodNames)
         {
-            var baseMethodName = item.MenuTarget.ToString();
+            var baseMethodName = menuItem.MenuTarget.ToString();
             var methodName = GetUniqueMethodName(baseMethodName, usedMethodNames);
 
-            return item.MenuTarget switch
+            return menuItem.MenuTarget switch
             {
                 MethodExecutionType.DeleteAllPlayerPrefs => $@"
-        [MenuItem(""{item.MenuPath}"", priority = {item.Priority})]
+        [MenuItem(""{menuItem.MenuPath}"", priority = {menuItem.Priority})]
         private static void {methodName}()
         {{
             PlayerPrefs.DeleteAll();
@@ -215,20 +215,20 @@ namespace CustomMenu.Scripts.Editor
         }}",
 
                 MethodExecutionType.ToggleDefaultSceneAutoLoad => $@"
-        [MenuItem(""{item.MenuPath}"", priority = {item.Priority})]
+        [MenuItem(""{menuItem.MenuPath}"", priority = {menuItem.Priority})]
         private static void {methodName}()
         {{
             DefaultSceneLoader.ToggleAutoLoad();
         }}
 
-        [MenuItem(""{item.MenuPath}"", true)]
+        [MenuItem(""{menuItem.MenuPath}"", true)]
         private static bool Validate{methodName}()
         {{
-            Menu.SetChecked(""{item.MenuPath}"", DefaultSceneLoader.IsDefaultSceneSet());
+            Menu.SetChecked(""{menuItem.MenuPath}"", DefaultSceneLoader.IsDefaultSceneSet());
             return true;
         }}",
 
-                _ => throw new ArgumentOutOfRangeException(nameof(item.MenuTarget), item.MenuTarget, null)
+                _ => throw new ArgumentOutOfRangeException(nameof(menuItem.MenuTarget), menuItem.MenuTarget, null)
             };
         }
 
